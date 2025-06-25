@@ -7,14 +7,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
 exports.register = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     try {
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'Email already registered' });
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
         const user = await User.create({
             firstName,
             lastName,
@@ -22,7 +19,6 @@ exports.register = async (req, res) => {
             password: hashedPassword,
         });
 
-        // Token
         const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
         res.status(201).json({
@@ -43,15 +39,12 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        // Find user
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-        // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-        // Token
         const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
         res.json({
