@@ -1,13 +1,10 @@
 const Event = require('../models/Event');
 
-// Create a new event
 exports.createEvent = async (req, res) => {
     try {
-        const { id, firstName, lastName, email } = req.user;
-
         const event = new Event({
             ...req.body,
-            createdBy: { id, firstName, lastName, email }
+            createdBy: req.user._id
         });
 
         await event.save();
@@ -21,7 +18,7 @@ exports.createEvent = async (req, res) => {
 exports.getAllEvents = async (req, res) => {
     try {
         const events = await Event.find()
-            .populate('clientId', 'clientName email phoneNumber')
+            .populate('clientId', 'clientName email phoneNumber').populate('createdBy', 'firstName lastName email')
             .sort({ eventDate: 1 });
 
         res.status(200).json({ success: true, data: events });
@@ -34,7 +31,7 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventById = async (req, res) => {
     try {
         const event = await Event.findById(req.params.id)
-            .populate('clientId', 'clientName email phoneNumber');
+            .populate('clientId', 'clientName email phoneNumber').populate('createdBy', 'firstName lastName email');
 
         if (!event) {
             return res.status(404).json({ success: false, message: 'Event not found' });
