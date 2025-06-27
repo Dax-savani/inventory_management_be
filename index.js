@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const auth = require('./middlewares/auth');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/client');
+const eventRoutes = require('./routes/event');
 const app = express();
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/client',auth, clientRoutes);
+app.use('/api/event',auth, eventRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB Connected'))
