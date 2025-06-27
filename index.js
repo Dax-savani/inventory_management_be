@@ -6,6 +6,8 @@ const auth = require('./middlewares/auth');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/client');
 const eventRoutes = require('./routes/event');
+const serviceRoutes = require('./routes/service');
+const rentalRoutes = require('./routes/rental');
 const app = express();
 
 dotenv.config();
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/client',auth, clientRoutes);
 app.use('/api/event',auth, eventRoutes);
+app.use('/api/service',auth, serviceRoutes);
+app.use('/api/rental',auth, rentalRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB Connected'))
