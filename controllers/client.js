@@ -4,7 +4,7 @@ exports.createClient = async (req, res) => {
     try {
         const client = new Client({
             ...req.body,
-            createdBy: req.user._id,
+            userId: req.user._id,
         });
         await client.save();
         res.status(201).json({ success: true, data: client });
@@ -18,7 +18,7 @@ exports.createClient = async (req, res) => {
 exports.getAllClients = async (req, res) => {
     try {
         const clients = await Client.find()
-            .populate('createdBy', 'firstName lastName email') // customize fields
+            .populate('userId', 'firstName lastName email') // customize fields
             .sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, data: clients });
@@ -31,7 +31,7 @@ exports.getAllClients = async (req, res) => {
 exports.getClientById = async (req, res) => {
     try {
         const client = await Client.findById(req.params.id)
-            .populate('createdBy', 'firstName lastName email');
+            .populate('userId', 'firstName lastName email');
 
         if (!client) {
             return res.status(404).json({ success: false, message: 'Client not found' });
