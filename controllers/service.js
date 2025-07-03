@@ -5,7 +5,7 @@ exports.createService = async (req, res) => {
     try {
         const service = new Service({
             ...req.body,
-            createdBy: req.user._id
+            userId: req.user._id
         });
 
         await service.save();
