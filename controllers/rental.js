@@ -5,7 +5,7 @@ exports.createRental = async (req, res) => {
     try {
         const rental = new Rental({
             ...req.body,
-            createdBy: req.user._id
+            userId: req.user._id
         });
 
         await rental.save();
