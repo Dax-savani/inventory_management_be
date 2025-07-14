@@ -5,7 +5,7 @@ exports.createContact = async (req, res) => {
     try {
         const newContact = new Contact(req.body);
         await newContact.save();
-        res.status(201).json({success: true, contact: newContact});
+        res.status(201).json({success: true, data: newContact});
     } catch (error) {
         res.status(500).json({success: false, message: 'Error creating contact', error: error.message});
     }
@@ -15,7 +15,7 @@ exports.createContact = async (req, res) => {
 exports.getAllContacts = async (req, res) => {
     try {
         const contacts = await Contact.find().sort({createdAt: -1});
-        res.status(200).json({success: true, contacts});
+        res.status(200).json({success: true, data: contacts});
     } catch (error) {
         res.status(500).json({success: false, message: 'Error fetching contacts', error: error.message});
     }
@@ -28,7 +28,7 @@ exports.getContactById = async (req, res) => {
         if (!contact) {
             return res.status(404).json({success: false, message: 'Contact not found'});
         }
-        res.status(200).json({success: true, contact});
+        res.status(200).json({success: true, data: contact});
     } catch (error) {
         res.status(500).json({success: false, message: 'Error fetching contact', error: error.message});
     }
@@ -45,7 +45,7 @@ exports.updateContact = async (req, res) => {
         if (!updatedContact) {
             return res.status(404).json({success: false, message: 'Contact not found'});
         }
-        res.status(200).json({success: true, contact: updatedContact});
+        res.status(200).json({success: true, data: updatedContact});
     } catch (error) {
         res.status(500).json({success: false, message: 'Error updating contact', error: error.message});
     }
