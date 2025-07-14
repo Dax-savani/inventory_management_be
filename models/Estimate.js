@@ -12,7 +12,7 @@ const estimateSchema = new mongoose.Schema({
     ],
     tax: Number,
     total: Number,
-    status: { type: String, default: 'Draft' }, // Draft, Sent, Approved
+    status: { type: String, default: 'Draft' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Estimate', estimateSchema);
