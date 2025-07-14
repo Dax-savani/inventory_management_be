@@ -28,7 +28,7 @@ app.use('/api/rental',auth, rentalRoutes);
 app.use('/api/leads',auth, leadRoutes);
 app.use('/api/estimates',auth, estimateRoutes);
 app.use('/api/invoices',auth, invoiceRoutes);
-app.use('/api/invoices', auth, contactRoutes);
+app.use('/api/contact', auth, contactRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB Connected'))
