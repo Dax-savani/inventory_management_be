@@ -31,10 +31,6 @@ const ContactSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    addProject: {
-        type: Boolean,
-        default: false
-    },
     mailingEmail: {
         type: String,
         trim: true,
