@@ -43,6 +43,15 @@ const ContactSchema = new mongoose.Schema({
     additionalInfo: {
         type: String,
         trim: true
+    },
+    tags: {
+        type: [String],
+        default: []
+    },
+    status: {
+        type: String,
+        enum: ['Lead', 'Contacted', 'Engaged', 'Client', 'Inactive', 'Lost'],
+        default: 'Lead'
     }
 }, {
     timestamps: true
