@@ -1,8 +1,4 @@
-// controllers/invoiceController.js
-
 const Invoice = require('../models/Invoice');
-const Project = require('../models/Project');
-const Contact = require('../models/Contact');
 
 // Create Invoice
 exports.createInvoice = async (req, res) => {
@@ -73,6 +69,14 @@ exports.updateInvoice = async (req, res) => {
         const updateData = req.body;
         const invoice = await Invoice.findByIdAndUpdate(req.params.id, updateData, { new: true });
         if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
+
+        // If status is updated to Paid, set paymentDate and update project stage
+        if (updateData.status === 'Paid') {
+            invoice.paymentDate = updateData.paymentDate || new Date();
+            await invoice.save();
+            await Project.findByIdAndUpdate(invoice.projectId, { stage: 'Retainer Paid' });
+        }
+
         return res.status(200).json(invoice);
     } catch (err) {
         return res.status(500).json({ error: err.message });
