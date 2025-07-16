@@ -1,13 +1,36 @@
 const Project = require('../models/Project');
+const Contact = require('../models/Contact');
+
+const stageToStatusMap = {
+    'Inquiry': 'Lead',
+    'Questionnaire Sent': 'Contacted',
+    'Follow Up': 'Contacted',
+    'Brochure sent': 'Engaged',
+    'Consult': 'Engaged',
+    'Proposal Sent': 'Engaged',
+    'Proposal Signed': 'Client',
+    'Retainer': 'Client'
+};
 
 // Create a new project
 exports.createProject = async (req, res) => {
     try {
+        const { contact, stage } = req.body;
+
+        // Create project
         const project = new Project(req.body);
         const savedProject = await project.save();
-        res.status(201).json({success: true, data:savedProject});
+
+        // Update contact status if contact ID and stage are provided
+        if (contact && stage && stageToStatusMap[stage]) {
+            await Contact.findByIdAndUpdate(contact, {
+                status: stageToStatusMap[stage]
+            });
+        }
+
+        res.status(201).json({ success: true, data: savedProject });
     } catch (error) {
-        res.status(400).json({  success: false,error: error.message });
+        res.status(400).json({ success: false, error: error.message });
     }
 };
 
@@ -42,14 +65,25 @@ exports.updateProject = async (req, res) => {
             req.body,
             { new: true, runValidators: true }
         );
+
         if (!updatedProject) {
-            return res.status(404).json({ success: false,message: 'Project not found' });
+            return res.status(404).json({ success: false, message: 'Project not found' });
         }
-        res.status(200).json({success: true,data:updatedProject});
+
+        // Sync contact status if stage is updated
+        const { stage, contact } = req.body;
+        if (stage && contact && stageToStatusMap[stage]) {
+            await Contact.findByIdAndUpdate(contact, {
+                status: stageToStatusMap[stage]
+            });
+        }
+
+        res.status(200).json({ success: true, data: updatedProject });
     } catch (error) {
-        res.status(400).json({ success: false,error: error.message });
+        res.status(400).json({ success: false, error: error.message });
     }
 };
+
 
 // Delete a project
 exports.deleteProject = async (req, res) => {
