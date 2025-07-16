@@ -20,7 +20,7 @@ const projectSchema = new mongoose.Schema({
     stage: {
         type: String,
         required: true,
-        enum: ['Inquiry', 'Questionnaire Sent', 'Follow Up', 'Brochure sent', 'Consult', 'Proposal Sent', 'Proposal Signed', 'Retainer'],
+        enum: ['Inquiry', 'Questionnaire Sent', 'Follow Up', 'Brochure sent', 'Consult', 'Proposal Sent', 'Proposal Signed', 'Retainer Paid','Planning','Site Visit','Completed','Archived'],
         default: 'Inquiry'
     },
     timezone: {
