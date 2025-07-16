@@ -1,4 +1,5 @@
 const Invoice = require('../models/Invoice');
+const Project = require('../models/Project');
 
 // Create Invoice
 exports.createInvoice = async (req, res) => {
@@ -22,7 +23,11 @@ exports.createInvoice = async (req, res) => {
             dueDate,
             notes,
             invoiceNumber,
+            status: 'Unpaid', // Make sure default status is set if your schema requires it
         });
+
+        // ⬇️ Update project stage to "Proposal Sent" after creating invoice
+        await Project.findByIdAndUpdate(projectId, { stage: 'Proposal Sent' });
 
         return res.status(201).json(invoice);
     } catch (err) {
@@ -40,28 +45,6 @@ exports.getInvoiceById = async (req, res) => {
         return res.status(500).json({ error: err.message });
     }
 };
-
-// Update Invoice Status
-// exports.updateInvoiceStatus = async (req, res) => {
-//     try {
-//         const { status, paymentDate } = req.body;
-//         const invoice = await Invoice.findById(req.params.id);
-//         if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
-//
-//         invoice.status = status;
-//         if (status === 'Paid') invoice.paymentDate = paymentDate || new Date();
-//         await invoice.save();
-//
-//         // Update project stage based on invoice status
-//         if (status === 'Paid') {
-//             await Project.findByIdAndUpdate(invoice.projectId, { stage: 'Retainer Paid' });
-//         }
-//
-//         return res.status(200).json(invoice);
-//     } catch (err) {
-//         return res.status(500).json({ error: err.message });
-//     }
-// };
 
 // Update Invoice
 exports.updateInvoice = async (req, res) => {
