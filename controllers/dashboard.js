@@ -1,5 +1,6 @@
 const Contact = require('../models/Contact');
 const Project = require('../models/Project');
+const Invoice = require('../models/Invoice');
 
 // Get dashboard data
 exports.getDashboardData = async (req, res) => {
@@ -22,13 +23,37 @@ exports.getDashboardData = async (req, res) => {
             .select('fullName email additionalInfo updatedAt')
             .sort({ updatedAt: -1 });
 
+        // 4. Calculate total earnings in current year from Paid invoices
+        const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+        const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1);
+
+        const totalEarningsAgg = await Invoice.aggregate([
+            {
+                $match: {
+                    status: 'Paid',
+                    paymentDate: {
+                        $gte: startOfYear,
+                        $lt: endOfYear
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$totalAmount" }
+                }
+            }
+        ]);
+
+        const totalEarnings = totalEarningsAgg.length > 0 ? totalEarningsAgg[0].total : 0;
 
         res.status(200).json({
             success: true,
             data: {
                 leads,
                 scheduledProjects,
-                notes: clientsWithNotes
+                notes: clientsWithNotes,
+                totalEarnings
             }
         });
     } catch (error) {

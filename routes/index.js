@@ -14,7 +14,7 @@ const contactRoutes = require("./contact");
 const projectRoutes = require("./project");
 
 router.use('/auth', authRoutes);
-router.use('/dashboard',auth, dashboardRoutes);
+router.use('/dashboard', dashboardRoutes);
 router.use('/client',auth, clientRoutes);
 router.use('/event',auth, eventRoutes);
 router.use('/service',auth, serviceRoutes);
