@@ -46,6 +46,19 @@ exports.getInvoiceById = async (req, res) => {
     }
 };
 
+// Get All Invoices
+exports.getAllInvoices = async (req, res) => {
+    try {
+        const invoices = await Invoice.find()
+            .sort({ createdAt: -1 })
+            .populate('projectId contactId');
+
+        return res.status(200).json(invoices);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
 // Update Invoice
 exports.updateInvoice = async (req, res) => {
     try {
