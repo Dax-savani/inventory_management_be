@@ -1,4 +1,61 @@
+const csvParser = require('csv-parser');
+const XLSX = require('xlsx');
 const Contact = require('../models/Contact');
+const { Readable } = require('stream');
+
+const formatContact = (row) => ({
+    fullName: row.fullName || '',
+    email: row.email || '',
+    contact: row.contact || '',
+    lastInteraction: row.lastInteraction ? new Date(row.lastInteraction) : undefined,
+    website: row.website || '',
+    organization: row.organization || '',
+    jobTitle: row.jobTitle || '',
+    mailingEmail: row.mailingEmail || '',
+    additionalInfo: row.additionalInfo || '',
+    tags: row.tags ? row.tags.split(',').map(t => t.trim()) : [],
+    status: row.status || 'Lead'
+});
+
+exports.importContacts = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        const buffer = req.file.buffer;
+        const ext = req.file.originalname.split('.').pop();
+
+        let contacts = [];
+
+        if (ext === 'csv') {
+            const stream = Readable.from(buffer);
+            stream
+                .pipe(csvParser())
+                .on('data', (row) => contacts.push(formatContact(row)))
+                .on('end', async () => {
+                    const saved = await Contact.insertMany(contacts);
+                    res.status(200).json({ success: true, count: saved.length, data: saved });
+                })
+                .on('error', (error) => {
+                    res.status(500).json({ success: false, message: 'Error parsing CSV', error: error.message });
+                });
+        } else if (ext === 'xlsx') {
+            const workbook = XLSX.read(buffer, { type: 'buffer' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet);
+            contacts = jsonData.map(formatContact);
+
+            const saved = await Contact.insertMany(contacts);
+            res.status(200).json({ success: true, count: saved.length, data: saved });
+        } else {
+            return res.status(400).json({ success: false, message: 'Invalid file format' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error importing contacts', error: error.message });
+    }
+};
 
 // Create a new contact
 exports.createContact = async (req, res) => {
