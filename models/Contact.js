@@ -17,7 +17,11 @@ const ContactSchema = new mongoose.Schema({
         trim: true
     },
     lastInteraction: {
-        type: Date
+        type: Date,
+        set: val => {
+            const date = new Date(val);
+            return isNaN(date.getTime()) ? undefined : date;
+        }
     },
     website: {
         type: String,
