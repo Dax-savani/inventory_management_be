@@ -46,6 +46,8 @@ exports.getDashboardData = async (req, res) => {
         ]);
 
         const totalEarnings = totalEarningsAgg.length > 0 ? totalEarningsAgg[0].total : 0;
+        const totalContactsCount = await Contact.countDocuments();
+        const totalProjectsCount = await Project.countDocuments();
 
         res.status(200).json({
             success: true,
@@ -53,7 +55,9 @@ exports.getDashboardData = async (req, res) => {
                 leads,
                 scheduledProjects,
                 notes: clientsWithNotes,
-                totalEarnings
+                totalEarnings,
+                totalContactsCount,
+                totalProjectsCount
             }
         });
     } catch (error) {
